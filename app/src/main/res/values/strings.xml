@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Idillika</string>
+    <string name="toolbar_main">IDILLIKA</string>
+    <string name="show_product">Показать товары</string>
+    <string name="toolbar_catalog">ОДЕЖДА</string>
+    <string name="toolbar_basket">КОРЗИНА</string>
+    <string name="menu_basket">Корзина</string>
+    <string name="empty_basket">Корзина пуста</string>
+    <string name="empty_basket_text">Добавленный вами товар будет здесь</string>
+    <string name="start_shopping">Начать покупки</string>
+</resources>
