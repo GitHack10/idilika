@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,11 +47,18 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
                 .load(item.getImageLink())
                 .into(holder.imageView);
 
-        holder.favorites.setChecked(load(String.valueOf(position)));
+        holder.favorites.setChecked(loadSP(String.valueOf(position)));
         holder.favorites.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                save(String.valueOf(position), true);
+                if (holder.favorites.isChecked()) {
+                    saveSP(String.valueOf(position), true);
+                    Toast.makeText(context, "Добавлено", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    deleteSp(String.valueOf(position));
+                    Toast.makeText(context, "Удалено", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -73,19 +81,28 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
             text = itemView.findViewById(R.id.textItem);
             price = itemView.findViewById(R.id.priceItem);
             favorites = itemView.findViewById(R.id.checkbox_favorite_item);
+            
         }
 
     }
 
-    public void save(String key, boolean value) {
+    //Сохраняет флажок в SharedPreferences
+    public void saveSP(String key, boolean value) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("Values", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
+        editor.putBoolean(key, value).apply();
     }
 
-    public boolean load(String key) {
+    //Загружает нажатый флажок из SharedPreferences
+    public boolean loadSP(String key) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("Values", Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean(key, false);
+    }
+
+    //Удаляет нажатый флажок из SharedPreferences
+    public void deleteSp(String key){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("Values", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(key).apply();
     }
 }
