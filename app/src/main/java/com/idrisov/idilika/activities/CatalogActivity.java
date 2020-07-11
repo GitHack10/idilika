@@ -77,7 +77,9 @@ public class CatalogActivity extends AppCompatActivity {
                     public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
                         ArrayList<Item> item = response.body();
                         catalogAdapter = new CatalogAdapter(CatalogActivity.this, item);
+                        catalogAdapter.notifyDataSetChanged();
                         recyclerView.setAdapter(catalogAdapter);
+                        //recyclerView.setItemViewCacheSize(item.size());
                     }
 
                     @Override

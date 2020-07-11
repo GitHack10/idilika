@@ -2,14 +2,13 @@ package com.idrisov.idilika;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +21,7 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
 
     Context context;
     ArrayList<Item> arrayList;
+    SparseBooleanArray sparseBooleanArray = new SparseBooleanArray();
 
     public CatalogAdapter(Context context, ArrayList<Item> arrayList) {
         this.context = context;
@@ -47,43 +47,17 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
                 .load(item.getImageLink())
                 .into(holder.imageView);
 
+        if (!sparseBooleanArray.get(position, false)) {
+            holder.favorites.setChecked(false);
+        } else
+            holder.favorites.setChecked(true);
+
         holder.favorites.setChecked(loadSP(String.valueOf(position)));
-        holder.favorites.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (holder.favorites.isChecked()) {
-                    saveSP(String.valueOf(position), true);
-                    Toast.makeText(context, "Добавлено", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    deleteSp(String.valueOf(position));
-                    Toast.makeText(context, "Удалено", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     @Override
     public int getItemCount() {
         return arrayList.size();
-    }
-
-
-    public static class CatalogViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        CheckBox favorites;
-        TextView title, text, price;
-
-        public CatalogViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imageView = itemView.findViewById(R.id.imageViewItem);
-            title = itemView.findViewById(R.id.titleItem);
-            text = itemView.findViewById(R.id.textItem);
-            price = itemView.findViewById(R.id.priceItem);
-            favorites = itemView.findViewById(R.id.checkbox_favorite_item);
-            
-        }
-
     }
 
     //Сохраняет флажок в SharedPreferences
@@ -100,9 +74,41 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
     }
 
     //Удаляет нажатый флажок из SharedPreferences
-    public void deleteSp(String key){
+    public void deleteSp(String key) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("Values", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(key).apply();
+    }
+
+    public class CatalogViewHolder extends RecyclerView.ViewHolder {
+        ImageView imageView;
+        CheckBox favorites;
+        TextView title, text, price;
+
+        public CatalogViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageView = itemView.findViewById(R.id.imageViewItem);
+            title = itemView.findViewById(R.id.titleItem);
+            text = itemView.findViewById(R.id.textItem);
+            price = itemView.findViewById(R.id.priceItem);
+            favorites = itemView.findViewById(R.id.checkbox_favorite_item);
+
+            favorites.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (!sparseBooleanArray.get(position, false)) {
+                        favorites.setChecked(true);
+                        sparseBooleanArray.put(position, true);
+                        saveSP(String.valueOf(position), true);
+                    } else {
+                        favorites.setChecked(false);
+                        sparseBooleanArray.put(position, false);
+                        deleteSp(String.valueOf(position));
+                    }
+                }
+            });
+        }
+
     }
 }
